@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -20,10 +21,49 @@ import Link from "next/link";
 
 export default function PreferencesPage() {
   const router = useRouter();
+  const [rewardType, setRewardType] = useState('cashback');
+  const [categories, setCategories] = useState({
+    travel: false,
+    shopping: false,
+    dining: false,
+    transportation: false
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/connect");
+
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      // Save preferences to MongoDB
+      const response = await fetch('/api/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          preferences: {
+            rewardType,
+            spendingCategories: categories
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save preferences');
+      }
+
+      // Navigate to connect page
+      router.push('/connect');
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
   };
 
   return (
@@ -69,7 +109,10 @@ export default function PreferencesPage() {
                   <p className="text-white/80">Choose your preferred type of rewards</p>
                 </div>
                 
-                <RadioGroup defaultValue="cashback" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <RadioGroup 
+  value={rewardType} 
+  onValueChange={setRewardType} 
+  className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[
                     {
                       id: "cashback",
@@ -166,6 +209,11 @@ export default function PreferencesPage() {
                       <div className="flex items-center space-x-3 bg-white/5 border border-white/10 rounded-xl p-6 group-hover:border-white/30 group-hover:bg-white/10 transition-all">
                         <input
                           type="checkbox"
+                          checked={categories[category.title.toLowerCase() as keyof typeof categories]}
+                          onChange={(e) => setCategories(prev => ({
+                            ...prev,
+                            [category.title.toLowerCase()]: e.target.checked
+                          }))}
                           className="rounded border-white/20 bg-white/10 text-[#FF5757] focus:ring-white/40"
                         />
                         <category.icon className="h-6 w-6 text-white" />
