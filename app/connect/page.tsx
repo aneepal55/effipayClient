@@ -8,17 +8,60 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Lock, Shield, Ban as Bank } from "lucide-react";
+import { Lock, Shield, Ban as Bank } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { usePlaidLink } from "react-plaid-link";
+import { useEffect, useState } from "react";
 
 export default function ConnectPage() {
   const router = useRouter();
+  const [linkToken, setLinkToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const createLinkToken = async () => {
+      try {
+        const response = await fetch("/api/plaid/create_link_token", {
+          method: "POST",
+        });
+        const { link_token } = await response.json();
+        setLinkToken(link_token);
+      } catch (error) {
+        console.error("Error creating link token:", error);
+      }
+    };
+
+    createLinkToken();
+  }, []);
+
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess: async (public_token) => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/plaid/exchange_public_token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ public_token }),
+        });
+
+        if (response.ok) {
+          router.push("/recommendation");
+        } else {
+          console.error("Failed to exchange public token");
+        }
+      } catch (error) {
+        console.error("Error exchanging public token:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
 
   const handleConnect = () => {
-    // Simulate bank connection
-    setTimeout(() => {
-      router.push("/recommendation");
-    }, 1000);
+    if (ready) {
+      open();
+    }
   };
 
   return (
@@ -58,21 +101,15 @@ export default function ConnectPage() {
               </div>
 
               <div className="border rounded-lg p-6">
-                <h3 className="font-medium mb-4">Select Your Bank</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {["Chase", "Bank of America", "Wells Fargo", "Citibank", "Capital One", "Other"].map(
-                    (bank) => (
-                      <Button
-                        key={bank}
-                        variant="outline"
-                        className="h-20 flex flex-col gap-2"
-                        onClick={handleConnect}
-                      >
-                        <Bank className="h-6 w-6" />
-                        {bank}
-                      </Button>
-                    )
-                  )}
+                <h3 className="font-medium mb-4">Connect with Plaid</h3>
+                <div className="flex justify-center">
+                  <Button
+                    size="lg"
+                    onClick={handleConnect}
+                    disabled={!ready || loading}
+                  >
+                    {loading ? "Connecting..." : "Connect Your Bank Account"}
+                  </Button>
                 </div>
               </div>
 
