@@ -51,6 +51,22 @@ export async function POST(request: Request) {
       }
     });
 
+    // Send access token to dummy endpoint
+    try {
+      const dummyEndpoint = 'https://api.example.com/plaid-token';
+      await fetch(dummyEndpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${exchangeResponse.data.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Successfully sent access token to dummy endpoint');
+    } catch (error) {
+      // Log error but don't fail the request
+      console.error('Failed to send access token to dummy endpoint:', error);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error exchanging public token:', error);
