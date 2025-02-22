@@ -32,8 +32,8 @@ export default function Home() {
               className="relative"
             >
               <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full transform -rotate-6 scale-110" />
-              <h1 className="relative text-7xl font-bold tracking-tight text-white mb-2" 
-                  style={{ fontFamily: 'var(--font-sans)' }}>
+              <h1 className="relative text-7xl tracking-tight text-white mb-2" 
+                  style={{ fontFamily: 'BauhausStd, var(--font-sans)' }}>
                 effipay
               </h1>
             </motion.div>
