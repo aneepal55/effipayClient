@@ -39,9 +39,19 @@ export default function ConnectPage() {
     onSuccess: async (public_token) => {
       setLoading(true);
       try {
+        // Get the JWT token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
+
         const response = await fetch("/api/plaid/exchange_public_token", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify({ public_token }),
         });
 

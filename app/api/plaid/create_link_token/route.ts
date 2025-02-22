@@ -1,4 +1,4 @@
-import { Configuration, PlaidApi, PlaidEnvironments, Products } from 'plaid';
+import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
 import { NextResponse } from 'next/server';
 
 const configuration = new Configuration({
@@ -22,7 +22,7 @@ export async function POST() {
       client_name: 'EffiPay',
       products: ['auth', 'transactions'] as Products[],
       language: 'en',
-      country_codes: ['US'],
+      country_codes: ['US'] as CountryCode[],
     };
 
     const createTokenResponse = await plaidClient.linkTokenCreate(request);
