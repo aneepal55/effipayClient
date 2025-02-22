@@ -7,6 +7,19 @@ const UserSchema = new mongoose.Schema({
     access_token: { type: String },
     item_id: { type: String },
     request_id: { type: String },
+  },
+  preferences: {
+    rewardType: {
+      type: String,
+      enum: ['cashback', 'points'],
+      default: 'cashback'
+    },
+    spendingCategories: {
+      travel: { type: Boolean, default: false },
+      shopping: { type: Boolean, default: false },
+      dining: { type: Boolean, default: false },
+      transportation: { type: Boolean, default: false }
+    }
   }
 }, { timestamps: true });
 
