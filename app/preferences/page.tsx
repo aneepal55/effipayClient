@@ -15,6 +15,7 @@ import {
   Percent,
   Gift,
   Sparkles,
+  Map,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -112,7 +113,7 @@ export default function PreferencesPage() {
                 <RadioGroup 
   value={rewardType} 
   onValueChange={setRewardType} 
-  className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
                     {
                       id: "cashback",
@@ -120,6 +121,13 @@ export default function PreferencesPage() {
                       title: "Cash Back",
                       description: "Get money back on your purchases",
                       highlight: "Up to 5% back on select categories",
+                    },
+                    {
+                      id: "miles",
+                      icon: Plane,
+                      title: "Miles",
+                      description: "Earn airline miles on purchases",
+                      highlight: "2x-3x miles on travel and dining",
                     },
                     {
                       id: "points",
