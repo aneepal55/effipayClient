@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
   preferences: {
     rewardType: {
       type: String,
-      enum: ['cashback', 'points'],
+      enum: ['cashback', 'points', 'miles'],
       default: 'cashback'
     },
     spendingCategories: {
